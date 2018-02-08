@@ -115,6 +115,8 @@ public class RCTMGLMapView extends MapView implements
     private Boolean mCompassEnabled;
     private Boolean mZoomEnabled;
     private boolean mShowUserLocation;
+    private boolean mStopped;
+    private boolean mInitialized;
 
     private long mActiveMarkerID = -1;
     private int mUserTrackingMode;
@@ -170,6 +172,58 @@ public class RCTMGLMapView extends MapView implements
         mHandler = new Handler();
 
         setLifecycleListeners();
+    }
+
+    public void setStopped(boolean stopped) {
+        if (stopped) {
+            stop();
+        } else {
+            restart();
+        }
+    }
+
+    private void stop() {
+        if (mStopped) {
+            return;
+        }
+        pause();
+        mStopped = true;
+        onStop();
+    }
+
+    private void restart() {
+        if (!mStopped) {
+            return;
+        }
+        mStopped = false;
+        onStart();
+        resume();
+    }
+
+    private void pause() {
+        if (mStopped) {
+            return;
+        }
+        if (mLocationManger.isActive()) {
+            mLocationManger.disable();
+        }
+        onPause();
+    }
+
+    private void resume() {
+        if (mStopped) {
+            return;
+        }
+        if (!mInitialized) {
+            mInitialized = true;
+            mStopped = true;
+            restart();
+            return;
+        }
+        if (mShowUserLocation && !mLocationManger.isActive()) {
+            mLocationManger.enable();
+        }
+        onResume();
     }
 
     @Override
@@ -1013,18 +1067,12 @@ public class RCTMGLMapView extends MapView implements
         reactContext.addLifecycleEventListener(new LifecycleEventListener() {
             @Override
             public void onHostResume() {
-                if (mShowUserLocation && !mLocationManger.isActive()) {
-                    mLocationManger.enable();
-                }
-                onResume();
+                resume();
             }
 
             @Override
             public void onHostPause() {
-                if (mLocationManger.isActive()) {
-                    mLocationManger.disable();
-                }
-                onPause();
+                pause();
             }
 
             @Override

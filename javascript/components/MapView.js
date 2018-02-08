@@ -143,6 +143,8 @@ class MapView extends React.Component {
      */
     textureMode: PropTypes.bool,
 
+    stopped: PropTypes.bool,
+
     /**
      * Map press listener, gets called when a user presses the map
      */

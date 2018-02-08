@@ -180,6 +180,11 @@ public class RCTMGLMapViewManager extends AbstractEventEmitter<RCTMGLMapView> {
         mapView.setReactUserLocationVerticalAlignment(userLocationVerticalAlignment);
     }
 
+    @ReactProp(name="stopped")
+    public void setStopped(RCTMGLMapView mapView, boolean stopped) {
+        mapView.setStopped(stopped);
+    }
+
     //endregion
 
     //region Custom Events
