@@ -8,6 +8,7 @@ import com.facebook.react.bridge.ReadableArray;
 import com.facebook.react.common.MapBuilder;
 import com.facebook.react.uimanager.ThemedReactContext;
 import com.facebook.react.uimanager.annotations.ReactProp;
+import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.rctmgl.components.AbstractEventEmitter;
 import com.mapbox.rctmgl.events.constants.EventKeys;
 import com.mapbox.rctmgl.utils.ConvertUtils;
@@ -195,6 +196,7 @@ public class RCTMGLMapViewManager extends AbstractEventEmitter<RCTMGLMapView> {
                 .put(EventKeys.MAP_CLICK, "onPress")
                 .put(EventKeys.MAP_LONG_CLICK,"onLongPress")
                 .put(EventKeys.MAP_ONCHANGE, "onMapChange")
+                .put(EventKeys.MAP_ON_LOCATION_CHANGE, "onLocationChange")
                 .put(EventKeys.MAP_USER_TRACKING_MODE_CHANGE, "onUserTrackingModeChange")
                 .put(EventKeys.MAP_ANDROID_CALLBACK, "onAndroidCallback")
                 .build();
@@ -210,6 +212,8 @@ public class RCTMGLMapViewManager extends AbstractEventEmitter<RCTMGLMapView> {
     public static final int METHOD_VISIBLE_BOUNDS = 4;
     public static final int METHOD_GET_POINT_IN_VIEW = 5;
     public static final int METHOD_TAKE_SNAP = 6;
+    public static final int METHOD_GET_ZOOM = 7;
+    public static final int METHOD_GET_CENTER = 8;
 
     @Nullable
     @Override
@@ -221,11 +225,20 @@ public class RCTMGLMapViewManager extends AbstractEventEmitter<RCTMGLMapView> {
                 .put("getVisibleBounds", METHOD_VISIBLE_BOUNDS)
                 .put("getPointInView", METHOD_GET_POINT_IN_VIEW)
                 .put("takeSnap", METHOD_TAKE_SNAP)
+                .put("getZoom", METHOD_GET_ZOOM)
+                .put("getCenter", METHOD_GET_CENTER)
                 .build();
     }
 
     @Override
     public void receiveCommand(RCTMGLMapView mapView, int commandID, @Nullable ReadableArray args) {
+        // allows method calls to work with componentDidMount
+        MapboxMap mapboxMap = mapView.getMapboxMap();
+        if (mapboxMap == null) {
+            mapView.enqueuePreRenderMapMethod(commandID, args);
+            return;
+        }
+
         switch (commandID) {
             case METHOD_SET_CAMERA:
                 mapView.setCamera(args.getString(0), args.getMap(1));
@@ -252,6 +265,12 @@ public class RCTMGLMapViewManager extends AbstractEventEmitter<RCTMGLMapView> {
                 break;
             case METHOD_TAKE_SNAP:
                 mapView.takeSnap(args.getString(0), args.getBoolean(1));
+                break;
+            case METHOD_GET_ZOOM:
+                mapView.getZoom(args.getString(0));
+                break;
+            case METHOD_GET_CENTER:
+                mapView.getCenter(args.getString(0));
                 break;
         }
     }

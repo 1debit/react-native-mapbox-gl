@@ -24,12 +24,13 @@
 | attributionEnabled | `bool` | `true` | `false` | The Mapbox terms of service, which governs the use of Mapbox-hosted vector tiles and styles,<br/>[requires](https://www.mapbox.com/help/how-attribution-works/) these copyright notices to accompany any map that features Mapbox-designed styles, OpenStreetMap data, or other Mapbox data such as satellite or terrain data.<br/>If that applies to this map view, do not hide this view or remove any notices from it.<br/><br/>You are additionally [required](https://www.mapbox.com/help/how-mobile-apps-work/#telemetry) to provide users with the option to disable anonymous usage and location sharing (telemetry).<br/>If this view is hidden, you must implement this setting elsewhere in your app. See our website for [Android](https://www.mapbox.com/android-docs/map-sdk/overview/#telemetry-opt-out) and [iOS](https://www.mapbox.com/ios-sdk/#telemetry_opt_out) for implementation details.<br/><br/>Enable/Disable attribution on map. For iOS you need to add MGLMapboxMetricsEnabledSettingShownInApp=YES<br/>to your Info.plist |
 | logoEnabled | `bool` | `true` | `false` | Enable/Disable the logo on the map. |
 | compassEnabled | `bool` | `none` | `false` | Enable/Disable the compass from appearing on the map |
-| textureMode | `bool` | `false` | `false` | Enable/Disable TextureMode instead of SurfaceView |
+| textureMode | `bool` | `false` | `false` | Enable/Disable TextureMode insted of SurfaceView |
 | onPress | `func` | `none` | `false` | Map press listener, gets called when a user presses the map |
 | onLongPress | `func` | `none` | `false` | Map long press listener, gets called when a user long presses the map |
 | onRegionWillChange | `func` | `none` | `false` | This event is triggered whenever the currently displayed map region is about to change. |
 | onRegionIsChanging | `func` | `none` | `false` | This event is triggered whenever the currently displayed map region is changing. |
 | onRegionDidChange | `func` | `none` | `false` | This event is triggered whenever the currently displayed map region finished changing |
+| onUserLocationUpdate | `func` | `none` | `false` | This event is triggered whenever the location engine receives a location update |
 | onWillStartLoadingMap | `func` | `none` | `false` | This event is triggered when the map is about to start loading a new map style. |
 | onDidFinishLoadingMap | `func` | `none` | `false` | This is triggered when the map has successfully loaded a new map style. |
 | onDidFailLoadingMap | `func` | `none` | `false` | This event is triggered when the map has failed to load a new map style. |
@@ -222,6 +223,38 @@ Takes snapshot of map with current tiles and returns a URI to the image
 | Name | Type | Required | Description  |
 | ---- | :--: | :------: | :----------: |
 | `writeToDisk` | `Boolean` | `Yes` | If true will create a temp file, otherwise it is in base64 |
+
+
+#### getZoom()
+
+Returns the current zoom of the map view.
+
+##### arguments
+| Name | Type | Required | Description  |
+| ---- | :--: | :------: | :----------: |
+
+
+
+
+```javascript
+const zoom = await this._map.getZoom();
+```
+
+
+#### getCenter()
+
+Returns the map's geographical centerpoint
+
+##### arguments
+| Name | Type | Required | Description  |
+| ---- | :--: | :------: | :----------: |
+
+
+
+
+```javascript
+const center = await this._map.getCenter();
+```
 
 
 
