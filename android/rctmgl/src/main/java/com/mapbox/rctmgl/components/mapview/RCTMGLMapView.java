@@ -231,8 +231,6 @@ public class RCTMGLMapView extends MapView implements
         }
         if (!mInitialized) {
             mInitialized = true;
-            mStopped = true;
-            restart();
             return;
         }
         if (mShowUserLocation && !mLocationManger.isActive()) {
