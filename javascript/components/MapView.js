@@ -100,6 +100,12 @@ class MapView extends React.Component {
     maxZoomLevel: PropTypes.number,
 
     /**
+     * Automatically change the language of the map labels to the system’s preferred language,
+     * this is not something that can be toggled on/off
+     */
+    localizeLabels: PropTypes.bool,
+
+    /**
      * Enable/Disable zoom on the map
      */
     zoomEnabled: PropTypes.bool,
@@ -143,9 +149,9 @@ class MapView extends React.Component {
     compassEnabled: PropTypes.bool,
 
     /**
-     * Enable/Disable TextureMode insted of SurfaceView
+     * [Android only] Enable/Disable use of GLSurfaceView insted of TextureView.
      */
-    textureMode: PropTypes.bool,
+    surfaceView: PropTypes.bool,
 
     stopped: PropTypes.bool,
 
@@ -239,6 +245,7 @@ class MapView extends React.Component {
     animated: false,
     heading: 0,
     pitch: 0,
+    localizeLabels: false,
     scrollEnabled: true,
     pitchEnabled: true,
     rotateEnabled: true,
@@ -247,7 +254,7 @@ class MapView extends React.Component {
     zoomLevel: 16,
     userTrackingMode: MapboxGL.UserTrackingModes.None,
     styleURL: MapboxGL.StyleURL.Street,
-    textureMode: false,
+    surfaceView: false,
   };
 
   constructor (props) {
@@ -647,7 +654,7 @@ class MapView extends React.Component {
       case MapboxGL.EventTypes.UserLocationUpdated:
         propName = 'onUserLocationUpdate';
         break;
-      case MapboxGL.EventTypes.WillStartLoadinMap:
+      case MapboxGL.EventTypes.WillStartLoadingMap:
         propName = 'onWillStartLoadingMap';
         break;
       case MapboxGL.EventTypes.DidFinishLoadingMap:
@@ -744,7 +751,7 @@ class MapView extends React.Component {
     };
 
     let mapView = null;
-    if (isAndroid() && this.props.textureMode && this.state.isReady) {
+    if (isAndroid() && !this.props.surfaceView && this.state.isReady) {
       mapView = (
         <RCTMGLAndroidTextureMapView {...props} {...callbacks}>
           {this.props.children}

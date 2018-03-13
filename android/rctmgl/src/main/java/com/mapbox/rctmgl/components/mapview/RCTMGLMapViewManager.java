@@ -22,8 +22,13 @@ import com.mapbox.services.commons.geojson.Point;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.FutureTask;
+import java.util.concurrent.RunnableFuture;
 
 import javax.annotation.Nullable;
+
+import static com.facebook.react.bridge.UiThreadUtil.runOnUiThread;
 
 /**
  * Created by nickitaliano on 8/18/17.
@@ -115,6 +120,11 @@ public class RCTMGLMapViewManager extends AbstractEventEmitter<RCTMGLMapView> {
     @ReactProp(name="animated")
     public void setAnimated(RCTMGLMapView mapView, boolean isAnimated) {
         mapView.setReactAnimated(isAnimated);
+    }
+
+    @ReactProp(name="localizeLabels")
+    public void setLocalizeLabels(RCTMGLMapView mapView, boolean localizeLabels) {
+        mapView.setLocalizeLabels(localizeLabels);
     }
 
     @ReactProp(name="zoomEnabled")
@@ -302,12 +312,10 @@ public class RCTMGLMapViewManager extends AbstractEventEmitter<RCTMGLMapView> {
     //endregion
 
     private static final class MapShadowNode extends LayoutShadowNode {
-        private Handler mMainHandler;
         private RCTMGLMapViewManager mViewManager;
 
         public MapShadowNode(RCTMGLMapViewManager viewManager) {
             mViewManager = viewManager;
-            mMainHandler = new Handler(Looper.getMainLooper());
         }
 
         @Override
@@ -316,16 +324,27 @@ public class RCTMGLMapViewManager extends AbstractEventEmitter<RCTMGLMapView> {
             diposeNativeMapView();
         }
 
+        /**
+         * We need this mapview to dispose (calls into nativeMap.destroy) before ReactNative starts tearing down the views in
+         * onDropViewInstance.
+         */
         private void diposeNativeMapView() {
             final RCTMGLMapView mapView = mViewManager.getByReactTag(getReactTag());
 
-            if (mapView != null) {
-                mMainHandler.post(new Runnable() {
-                    @Override
-                    public void run() {
-                        mapView.dispose();
-                    }
-                });
+            RunnableFuture<Void> task = new FutureTask<>(new Runnable() {
+                @Override
+                public void run() {
+                    mapView.dispose();
+                }
+            }, null);
+
+            runOnUiThread(task);
+
+            try {
+                task.get(); // this will block until Runnable completes
+            } catch (InterruptedException | ExecutionException e) {
+                // handle exception
+                Log.e(getClass().getSimpleName() , " diposeNativeMapView() exception destroying map view", e);
             }
         }
     }
