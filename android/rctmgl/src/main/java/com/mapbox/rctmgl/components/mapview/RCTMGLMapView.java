@@ -360,7 +360,9 @@ public class RCTMGLMapView extends MapView implements
             onPause();
         }
 
-        onStop();
+        if (!mStopped) {
+            onStop();
+        }   
         onDestroy();
     }
 
