@@ -155,6 +155,7 @@ class ShapeSource extends React.Component {
       maxZoomLevel: this.props.maxZoomLevel,
       buffer: this.props.buffer,
       tolerance: this.props.tolerance,
+      hitbox: this.props.hitbox,
       ...this._getImages(),
       onPress: undefined,
     };
