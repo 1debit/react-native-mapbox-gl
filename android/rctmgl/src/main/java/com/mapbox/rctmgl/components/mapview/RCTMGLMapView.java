@@ -242,6 +242,13 @@ public class RCTMGLMapView extends MapView implements
         }
         onResume();
     }
+                
+    @Override
+    protected void onLayout(boolean changed, int left, int top, int right, int bottom) {
+        if (!mPaused) {
+            super.onLayout(changed, left, top, right, bottom);
+        }
+    }
 
     @Override
     public void onResume() {
